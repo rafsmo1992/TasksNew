@@ -6,7 +6,9 @@ import com.crud.tasks.mapper.TaskMapper;
 import com.crud.tasks.service.DbService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -26,11 +28,16 @@ public class TaskController {
     return taskMapper.mapToTaskDtoList(tasks);
     }
     @GetMapping(value = "{taskId}")
-    public TaskDto getTask(@PathVariable Long taskId) throws TaskNotFoundException
-    { return taskMapper.mapToTaskDto(
-            service.getTask(taskId).orElseThrow(TaskNotFoundException::new)
-    );
-    }
+    public ResponseEntity<TaskDto> getTask(@PathVariable Long taskId) throws TaskNotFoundException
+    {
+        try {
+            return new ResponseEntity<>(taskMapper.mapToTaskDto(service.getTask(taskId)), HttpStatus.OK);
+        }
+        catch (TaskNotFoundException e) {
+        return new ResponseEntity<>(
+                new TaskDto(0L,"There is no task with id equal to " + taskId, ""),HttpStatus.BAD_GATEWAY);
+        }
+        }
     @DeleteMapping
     public void deleteTask(long taskId)
     {
