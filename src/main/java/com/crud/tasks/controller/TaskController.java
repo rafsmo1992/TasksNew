@@ -27,16 +27,12 @@ public class TaskController {
     List<Task>tasks = service.getAllTasks();
     return taskMapper.mapToTaskDtoList(tasks);
     }
+
+
     @GetMapping(value = "{taskId}")
     public ResponseEntity<TaskDto> getTask(@PathVariable Long taskId) throws TaskNotFoundException
     {
-        try {
-            return new ResponseEntity<>(taskMapper.mapToTaskDto(service.getTask(taskId)), HttpStatus.OK);
-        }
-        catch (TaskNotFoundException e) {
-        return new ResponseEntity<>(
-                new TaskDto(0L,"There is no task with id equal to " + taskId, ""),HttpStatus.BAD_GATEWAY);
-        }
+        return ResponseEntity.ok(taskMapper.mapToTaskDto(service.getTask(taskId)));
         }
     @DeleteMapping
     public void deleteTask(long taskId)
