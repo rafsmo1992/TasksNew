@@ -1,0 +1,15 @@
+DROP PROCEDURE IF EXISTS UserID;
+
+DELIMITER $$
+
+CREATE PROCEDURE UserID(idNumber INT)
+BEGIN
+    IF idNumber <= 0 THEN
+        SELECT 'Invalid User ID' as 'UserID';
+    else
+        SELECT READER_ID, FIRSTNAME, LASTNAME FROM READERS WHERE READER_ID = idNumber;
+    end if;
+end $$
+DELIMITER ;
+
+CALL UserID(1);
