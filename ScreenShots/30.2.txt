@@ -1,0 +1,26 @@
+ALTER TABLE BOOKS ADD BESTSELLER BOOLEAN DEFAULT 0;
+DROP PROCEDURE IF EXISTS UpdateBestsellers;
+DELIMITER $$
+CREATE PROCEDURE UpdateBestsellers()
+BEGIN
+    DECLARE BK_ID INT;
+    DECLARE FINISHED INT DEFAULT 0;
+    DECLARE ALL_BESTSELLERS cursor for select book_id from rents group by
+                                                                     EXTRACT( YEAR_MONTH FROM rent_date),book_id having count(*) > 2 ;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET FINISHED = 1;
+    OPEN ALL_BESTSELLERS;
+    WHILE (FINISHED = 0) DO
+            FETCH ALL_BESTSELLERS INTO BK_ID;
+            IF(FINISHED = 0) THEN
+                UPDATE BOOKS SET BESTSELLER = true
+                             WHERE BOOK_ID = BK_ID;
+                COMMIT;
+            END IF;
+        END WHILE;
+    CLOSE ALL_BESTSELLERS;
+END $$
+
+DELIMITER ;
+CALL UpdateBestsellers();
+
+Select * From BOOKS;
